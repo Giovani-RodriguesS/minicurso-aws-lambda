@@ -1,2 +1,3 @@
 *dynamodb_data/
-.aws-sam/
+*.aws-sam/
+*sam-env/

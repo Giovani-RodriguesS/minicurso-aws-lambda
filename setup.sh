@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Para o script se qualquer comando falhar
+    # CASO DE ERRO, TENTAR RODAR:
+    # sudo snap install aws-cli --classic
+
 set -e
 
 # Função para verificar e instalar o AWS CLI
@@ -32,9 +34,10 @@ install_sam_cli() {
         sam --version
     else
         echo "Instalando SAM CLI..."
-        wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip -O sam-cli.zip
-        unzip -q sam-cli.zip -d sam-installation
+        curl -L https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip -o sam-cli.zip
+        unzip sam-cli.zip -d sam-installation
         sudo ./sam-installation/install
+        
         
         echo "Limpando arquivos de instalação do SAM CLI..."
         rm sam-cli.zip
@@ -60,5 +63,7 @@ install_aws_cli
 # 3. Instalar SAM CLI
 install_sam_cli
 
+./install-go.sh
+# ./install-pip.sh
 echo ""
 echo "--- Processo concluído! ---"

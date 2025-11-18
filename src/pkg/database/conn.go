@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Giovani-RodriguesS/Serverless-Aws/project/src/pkg/utils"
+	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/pkg/utils"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"

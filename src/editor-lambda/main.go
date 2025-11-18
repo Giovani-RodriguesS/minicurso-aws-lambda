@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/pkg/database"
 	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/editor-lambda/internal"
-	
+	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/pkg/database"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 )
 

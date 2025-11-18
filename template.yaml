@@ -1,84 +1,85 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
-Description: >
-  Template básico para mimicurso - Criação de Tabela DynamoDB, API Gateway, SQS e Lambdas em Go.
+  AWSTemplateFormatVersion: '2010-09-09'
+  Transform: AWS::Serverless-2016-10-31
+  Description: >
+    Template básico para mimicurso - Criação de Tabela DynamoDB, API Gateway, SQS e Lambdas em Go.
 
-Parameters:
-  LabRole:
-    Type: String
-    Description: Role padrão para laboratórios
+  Parameters:
+    LabRole:
+      Type: String
+      Description: Role padrão para laboratórios
 
-Globals:
-  Function:
-    Runtime: go1.x
-    Handler: bootstrap
-    Timeout: 120
-    MemorySize: 128
+  Globals:
+    Function:
+      Runtime: go1.x
+      Handler: bootstrap
+      Timeout: 120
+      MemorySize: 128
 
-Resources:
-  # 1. Tabela DynamoDB
-  DynamoTable:
-    Type: AWS::Serverless::SimpleTable
-    Properties:
-      TableName: ItemsTable
-      PrimaryKey:
-        Name: ItemID 
-        Type: String
-      BillingMode: PAY_PER_REQUEST 
+  Resources:
+    # 1. Tabela DynamoDB
+    DynamoTable:
+      Type: AWS::Serverless::SimpleTable
+      Properties:
+        TableName: ItemsTable
+        PrimaryKey:
+          Name: ItemID 
+          Type: String
 
-  # 2. HTTP API Gateway
-  HttpApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      StageName: v1
+    # 2. HTTP API Gateway
+    HttpApi:
+      Type: AWS::Serverless::HttpApi
+      Properties:
+        StageName: v1
 
-  # 3. Fila SQS
-  MessageEditorQueue:
-    Type: AWS::SQS::Queue
-    Properties:
-      QueueName: MessageEditorQueue
+    # 3. Fila SQS
+    MessageEditorQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: MessageEditorQueue
 
-  # 4. Função Lambda (Leitura) - Gatilho: HTTP API
-  ReadItemsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/viewer-lambda/ 
-      Role: !Ref LabRole
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref DynamoTable
-      Events:
-        ApiEvent:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref HttpApi
-            Path: /items # Ex: GET /items
-            Method: GET
+    # 4. Função Lambda (Leitura) - Gatilho: HTTP API
+    ViewerItemsFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: src/viewer-lambda/ 
+        Role: !Ref LabRole
+        Environment:
+          Variables:
+            TABLE_NAME: !Ref DynamoTable
+            ENV: cloud
+        Events:
+          ApiEvent:
+            Type: HttpApi
+            Properties:
+              ApiId: !Ref HttpApi
+              Path: /items # Ex: GET /items
+              Method: GET
 
-  # 5. Função Lambda (Escrita) - Gatilho: SQS
-  WriteItemFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/editor-lambda/
-      Role: !Ref LabRole
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref DynamoTable
-      Events:
-        SqsEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt MessageEditorQueue.Arn
-            BatchSize: 1
-            MaximumRetryAttempts: 0 
+    # 5. Função Lambda (Escrita) - Gatilho: SQS
+    EditorItemFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: src/editor-lambda/
+        Role: !Ref LabRole
+        Environment:
+          Variables:
+            TABLE_NAME: !Ref DynamoTable
+            ENV: cloud
+        Events:
+          SqsEvent:
+            Type: SQS
+            Properties:
+              Queue: !GetAtt MessageEditorQueue.Arn
+              BatchSize: 1
+              MaximumRetryAttempts: 0 
 
-Outputs:
-  ApiEndpoint:
-    Description: "URL do API Gateway"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1"
-  TableName:
-    Description: "Nome da tabela DynamoDB"
-    Value: !Ref DynamoTable
-  QueueUrl:
-    Description: "URL da fila SQS"
-    Value: !Ref MessageEditorQueue
+  Outputs:
+    ApiEndpoint:
+      Description: "URL do API Gateway"
+      Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1"
+    TableName:
+      Description: "Nome da tabela DynamoDB"
+      Value: !Ref DynamoTable
+    QueueUrl:
+      Description: "URL da fila SQS"
+      Value: !Ref MessageEditorQueue

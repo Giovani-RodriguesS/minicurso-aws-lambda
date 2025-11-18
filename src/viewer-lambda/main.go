@@ -14,8 +14,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 
-	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/pkg/models"
 	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/pkg/database"
+	"github.com/Giovani-RodriguesS/minicurso-aws-lambda/src/pkg/models"
+
 )
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

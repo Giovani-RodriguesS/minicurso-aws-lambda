@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template simplificado para teste local da EditorItemFunction.
+
+Globals:
+  Function:
+    Runtime: go1.x
+    Handler: bootstrap
+    Timeout: 120
+    MemorySize: 128
+
+Resources:
+  # A função que você quer testar
+  EditorItemFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/editor-lambda
+      Environment:
+        Variables:
+          TABLE_NAME: "ItemsTable"
+          ENV: "local"
